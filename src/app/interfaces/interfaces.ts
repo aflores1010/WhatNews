@@ -2,6 +2,7 @@ export interface TopHeadlinesResponse {
     status: string;
     totalResults: number;
     articles: Article[];
+    error?: string;
   }
   
  export interface Article {

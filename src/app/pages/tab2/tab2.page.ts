@@ -2,6 +2,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { IonSegment } from '@ionic/angular';
 import { NewsService } from 'src/app/services/news.service';
 import { Article } from 'src/app/interfaces/interfaces';
+import { IfStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-tab2',
@@ -33,13 +34,18 @@ export class Tab2Page implements OnInit{
 
     this.newsService.getCategorizedNews(category).subscribe(res => {
 
-      if (res.articles.length ===0) {
+      if(res.status === 'error' && res.error) {
+        event.target.disable= true;
+        event.target.complete();
+        console.log('Toast de update service to paid')
+        return;
+      }
+
+      if (res.articles.length ===0 ) {
         event.target.disable= true;
         event.target.complete();
         return;
       }
-      
-      console.log(res);
       // this.news = res.articles;
       this.news.push(...res.articles);
 
@@ -47,7 +53,7 @@ export class Tab2Page implements OnInit{
         event.target.complete();
       }
       
-    });
-  }
+    })
+  };
 
 }

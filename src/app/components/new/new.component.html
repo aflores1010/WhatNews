@@ -5,14 +5,20 @@
     <ion-card-subtitle>
       <span class="text-primary">{{ index + 1 }}. </span>
       <span class="source-name">{{ new.source.name }}</span>
+
+      <div class="more">
+        <ion-button fill="clear" (click)="showActionSheet()">
+         <ion-icon slot="icon-only" name="more"></ion-icon>
+        </ion-button>
+      </div>
     </ion-card-subtitle>
 
-    <ion-card-title>{{ new.title }}</ion-card-title>
+    <ion-card-title (click)="goToLink()">{{ new.title }}</ion-card-title>
 
   </ion-card-header>
 
 
-  <ion-img *ngIf="new.urlToImage" [src]="new.urlToImage"></ion-img>
+  <ion-img (click)="goToLink()" *ngIf="new.urlToImage" [src]="new.urlToImage"></ion-img>
   <ion-card-content>
     {{ new.description }}
   </ion-card-content>
