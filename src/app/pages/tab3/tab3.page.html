@@ -1,9 +1,14 @@
-<ion-header>
-  <ion-toolbar>
+<ion-header no-border>
+  <ion-toolbar color="dark">
     <ion-title>
-      Tab Three
+      Favorites
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content color="dark">
+  <div *ngIf="favoritesNews.length === 0">
+    No registers
+  </div>
+  <app-news [news]="favoritesNews" [isFromFavorite]="true"></app-news>
+</ion-content>

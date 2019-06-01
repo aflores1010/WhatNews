@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Article } from '../../interfaces/interfaces';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { ActionSheetController } from '@ionic/angular';
+import { ActionSheetController, Events } from '@ionic/angular';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
+import { LocalDataService } from 'src/app/services/local-data.service';
 
 @Component({
   selector: 'app-new',
@@ -13,18 +14,48 @@ export class NewComponent implements OnInit {
 
   @Input() new: Article;
   @Input() index: number;
+  @Input() isFromFavorite;
+  favoriteText = '';
 
   constructor(private inAppBroser: InAppBrowser,
               private socialSharing: SocialSharing,
-             public actionSheetController: ActionSheetController) { }
+              public actionSheetController: ActionSheetController,
+              private events: Events,
+              private localDataService: LocalDataService) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('isFromFavorite', this.isFromFavorite);
+  }
 
   goToLink() {
     this.inAppBroser.create(this.new.url, '_system');
   }
 
   async showActionSheet() {
+
+    let saveDeleteButton;
+    if(!this.isFromFavorite){
+      saveDeleteButton = {
+        cssClass: 'action-dark-button',
+        text: 'Save favorite',
+        icon: 'star',
+        handler: () => {
+          this.save();
+        }
+      };
+    } else {
+      saveDeleteButton = {
+        cssClass: 'action-dark-button',
+        text: 'Delete favorite',
+        icon: 'trash',
+        handler: () => {
+          this.localDataService.deleteFavorite(this.new);
+          this.events.publish('reloadFavorites');
+        }
+      };
+    }
+    
+
     const actionSheet = await this.actionSheetController.create({
       header: 'Opciones',
       buttons: [{
@@ -34,14 +65,9 @@ export class NewComponent implements OnInit {
         handler: () => {
           this.share();
         }
-      }, {
-        cssClass: 'action-dark-button',
-        text: 'Save as favorite',
-        icon: 'star',
-        handler: () => {
-          console.log('Play clicked');
-        }
-      }]
+      }, 
+      saveDeleteButton
+    ]
     });
     await actionSheet.present();
   }
@@ -54,6 +80,10 @@ export class NewComponent implements OnInit {
       '',
       this.new.url
     );
+  }
+
+  save() {
+    this.localDataService.saveFavorite(this.new);
   }
 
 }
