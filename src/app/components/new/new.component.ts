@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Article } from '../../interfaces/interfaces';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { ActionSheetController, Events } from '@ionic/angular';
+import { ActionSheetController, Events, Platform } from '@ionic/angular';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { LocalDataService } from 'src/app/services/local-data.service';
 
@@ -21,6 +21,7 @@ export class NewComponent implements OnInit {
               private socialSharing: SocialSharing,
               public actionSheetController: ActionSheetController,
               private events: Events,
+              private platform: Platform,
               private localDataService: LocalDataService) { }
 
   ngOnInit() {
@@ -73,13 +74,26 @@ export class NewComponent implements OnInit {
   }
 
   share() {
-    console.log('sharing');
-    this.socialSharing.share(
-      this.new.title,
-      this.new.source.name,
-      '',
-      this.new.url
-    );
+    if(this.platform.is('cordova')) {
+      this.socialSharing.share(
+        this.new.title,
+        this.new.source.name,
+        '',
+        this.new.url
+      );
+    }
+     
+    if (navigator['share']) {
+      navigator['share']({
+          title: this.new.title,
+          text: this.new.description,
+          url: this.new.url,
+      })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing', error));
+    } else {
+      console.log('Share is not available in this device');
+    }
   }
 
   save() {
